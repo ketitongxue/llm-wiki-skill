@@ -12,7 +12,7 @@ DIRECTORIES = (
     "raw/articles", "raw/papers", "raw/transcripts", "raw/assets",
     "wiki/entities", "wiki/concepts", "wiki/comparisons", "wiki/queries",
 )
-TOKEN_PATTERN = re.compile(r"\{\{[A-Z][A-Z0-9_]*\}\}")
+TOKEN_PATTERN = re.compile(r"\{\{[^{}]+\}\}")
 DOMAIN_TOKEN = "{" * 2 + "DOMAIN" + "}" * 2
 
 

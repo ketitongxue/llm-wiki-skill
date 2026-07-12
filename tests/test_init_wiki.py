@@ -44,21 +44,23 @@ class InitializeWikiTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "domain"):
                 initialize(Path(temporary) / "wiki", "   ")
 
-    def test_rejects_an_undeclared_template_token_before_writing(self):
-        with TemporaryDirectory() as temporary:
-            root = Path(temporary) / "package"
-            templates = root / "templates"
-            templates.mkdir(parents=True)
-            for name in init_wiki.TEMPLATE_NAMES:
+    def test_rejects_any_undeclared_template_token_before_writing(self):
+        variants = ["OTHER", "domain", " domain "]
+        for value in variants:
+            with self.subTest(value=value), TemporaryDirectory() as temporary:
+                root = Path(temporary) / "package"
+                templates = root / "templates"
+                templates.mkdir(parents=True)
                 domain_token = "{" * 2 + "DOMAIN" + "}" * 2
-                (templates / name).write_text(f"# {domain_token}\n", encoding="utf-8")
-            other = "{" * 2 + "OTHER" + "}" * 2
-            (templates / "index.md").write_text(f"# {other}\n", encoding="utf-8")
-            destination = Path(temporary) / "wiki"
-            with patch.object(init_wiki, "ROOT", root):
-                with self.assertRaisesRegex(ValueError, "OTHER"):
-                    initialize(destination, "systems")
-            self.assertFalse(destination.exists())
+                for name in init_wiki.TEMPLATE_NAMES:
+                    (templates / name).write_text(f"# {domain_token}\n", encoding="utf-8")
+                unresolved = "{" * 2 + value + "}" * 2
+                (templates / "index.md").write_text(f"# {unresolved}\n", encoding="utf-8")
+                destination = Path(temporary) / "wiki"
+                with patch.object(init_wiki, "ROOT", root):
+                    with self.assertRaisesRegex(ValueError, "template token"):
+                        initialize(destination, "systems")
+                self.assertFalse(destination.exists())
 
     def test_cli_requires_path_and_domain_and_initializes(self):
         script = Path(__file__).resolve().parents[1] / "scripts/init_wiki.py"
