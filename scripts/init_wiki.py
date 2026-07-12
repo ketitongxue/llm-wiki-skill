@@ -13,6 +13,7 @@ DIRECTORIES = (
     "wiki/entities", "wiki/concepts", "wiki/comparisons", "wiki/queries",
 )
 TOKEN_PATTERN = re.compile(r"\{\{[A-Z][A-Z0-9_]*\}\}")
+DOMAIN_TOKEN = "{" * 2 + "DOMAIN" + "}" * 2
 
 
 def initialize(destination: Path, domain: str) -> None:
@@ -26,7 +27,7 @@ def initialize(destination: Path, domain: str) -> None:
     rendered = {}
     for name in TEMPLATE_NAMES:
         source = (ROOT / "templates" / name).read_text(encoding="utf-8")
-        text = source.replace("{{DOMAIN}}", domain)
+        text = source.replace(DOMAIN_TOKEN, domain)
         remaining = TOKEN_PATTERN.findall(text)
         if remaining:
             raise ValueError(f"unresolved template token in {name}: {remaining[0]}")

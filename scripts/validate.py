@@ -14,9 +14,9 @@ REQUIRED_FILES = (
     "references/lint-checklist.md", "references/publishing-example.md",
 )
 IGNORED_DIRECTORIES = {".git", "dist", "__pycache__"}
-TEXT_SUFFIXES = {".md", ".py", ".txt", ".json", ".yml", ".yaml", ""}
-TOKEN = re.compile(r"\{\{[A-Z][A-Z0-9_]*\}\}")
+TOKEN = re.compile(r"\{\{[^\r\n{}]*\}\}")
 LINK = re.compile(r"\[[^]]*\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
+DOMAIN_TOKEN = "{" * 2 + "DOMAIN" + "}" * 2
 
 
 def _files(root: Path):
@@ -26,8 +26,24 @@ def _files(root: Path):
             continue
         if path.is_symlink():
             yield path
-        elif path.is_file() and path.suffix.lower() in TEXT_SUFFIXES:
+        elif path.is_file():
             yield path
+
+
+def _valid_skill_frontmatter(text: str) -> bool:
+    match = re.match(r"\A---\n(.*?)\n---\n", text, re.DOTALL)
+    if not match:
+        return False
+    fields = {}
+    for line in match.group(1).splitlines():
+        if ":" in line:
+            key, value = line.split(":", 1)
+            fields[key.strip()] = value.strip()
+    return (
+        fields.get("name") == "llm-wiki"
+        and bool(fields.get("description"))
+        and fields.get("license") == "MIT"
+    )
 
 
 def validate_repository(root: Path) -> list[str]:
@@ -43,6 +59,8 @@ def validate_repository(root: Path) -> list[str]:
             errors.append(f"symlink is not allowed: {relative}")
             continue
         raw = path.read_bytes()
+        if b"\x00" in raw:
+            continue
         if b"\r\n" in raw:
             errors.append(f"CRLF line endings are not allowed: {relative}")
         try:
@@ -63,15 +81,28 @@ def validate_repository(root: Path) -> list[str]:
             errors.append(f"Windows user path: {relative}")
         if re.search(r"\b(?:gh[pousr]_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,}|AKIA[A-Z0-9]{16})\b", text):
             errors.append(f"possible credential: {relative}")
-        if "-----BEGIN " + "PRIVATE KEY-----" in text:
+        assignment = re.compile(
+            r"(?im)^\s*[A-Za-z0-9_.-]*(?:api[_-]?key|token|secret|password)"
+            r"[A-Za-z0-9_.-]*\s*[:=]\s*(['\"])[^'\"\r\n]{8,}\1\s*(?:#.*)?$"
+        )
+        for _ in assignment.finditer(text):
+            errors.append(f"possible credential assignment: {relative}")
+        private_key_header = re.compile(
+            r"-----BEGIN (?:RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----"
+        )
+        for _ in private_key_header.finditer(text):
             errors.append(f"private key material: {relative}")
 
+        for token in TOKEN.findall(text):
+            allowed = relative in {
+                "templates/SCHEMA.md", "templates/purpose.md",
+                "templates/index.md", "templates/log.md",
+            } and token == DOMAIN_TOKEN
+            if not allowed:
+                errors.append(f"undeclared template token {token}: {relative}")
+
         if path.suffix.lower() == ".md":
-            for token in TOKEN.findall(text):
-                allowed = "{{" + "DOMAIN" + "}}"
-                if token != allowed:
-                    errors.append(f"undeclared template token {token}: {relative}")
-            if relative == "SKILL.md" and not re.match(r"\A---\n.+?\n---\n", text, re.DOTALL):
+            if relative == "SKILL.md" and not _valid_skill_frontmatter(text):
                 errors.append("SKILL.md has invalid frontmatter")
             for raw_target in LINK.findall(text):
                 parsed = urlsplit(raw_target)

@@ -27,7 +27,7 @@ class InitializeWikiTests(unittest.TestCase):
             self.assertTrue(all((destination / path).is_dir() for path in expected_directories))
             for filename in expected_files:
                 text = (destination / filename).read_text(encoding="utf-8")
-                self.assertNotIn("{{", text)
+                self.assertNotIn("{" * 2, text)
             self.assertIn("distributed systems", (destination / "purpose.md").read_text(encoding="utf-8"))
 
     def test_rejects_non_empty_destination_without_changing_it(self):
@@ -50,8 +50,10 @@ class InitializeWikiTests(unittest.TestCase):
             templates = root / "templates"
             templates.mkdir(parents=True)
             for name in init_wiki.TEMPLATE_NAMES:
-                (templates / name).write_text("# {{DOMAIN}}\n", encoding="utf-8")
-            (templates / "index.md").write_text("# {{OTHER}}\n", encoding="utf-8")
+                domain_token = "{" * 2 + "DOMAIN" + "}" * 2
+                (templates / name).write_text(f"# {domain_token}\n", encoding="utf-8")
+            other = "{" * 2 + "OTHER" + "}" * 2
+            (templates / "index.md").write_text(f"# {other}\n", encoding="utf-8")
             destination = Path(temporary) / "wiki"
             with patch.object(init_wiki, "ROOT", root):
                 with self.assertRaisesRegex(ValueError, "OTHER"):

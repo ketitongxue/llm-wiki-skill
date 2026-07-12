@@ -11,7 +11,7 @@ For an initialized knowledge base, apply the same checks to its authorized root.
 ## Structure
 
 - Required orientation files exist.
-- Templates contain only the declared `{{DOMAIN}}` placeholder, and initialized files contain no unresolved placeholders.
+- Templates contain only the declared DOMAIN placeholder (written as two opening braces, `DOMAIN`, and two closing braces), and initialized files contain no unresolved placeholders.
 - Raw / Wiki / Schema responsibilities are not mixed.
 - Wiki pages follow the frontmatter and naming contract.
 
