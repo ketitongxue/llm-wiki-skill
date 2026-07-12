@@ -4,11 +4,11 @@ Use this page as the stable entry point into the wiki.
 
 ## Hubs
 
-- [Example domain](wiki/example-domain.md) — replace with the primary navigation hub.
+- `wiki/example-domain.md` — replace with a link to the primary navigation hub.
 
 ## Concepts and mechanisms
 
-- [Example mechanism](wiki/example-mechanism.md) — replace with a durable explanation.
+- `wiki/example-mechanism.md` — replace with a link to a durable explanation.
 
 ## Recently maintained
 

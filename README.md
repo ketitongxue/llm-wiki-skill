@@ -34,6 +34,20 @@ Then try:
 - [Publishing example](references/publishing-example.md)
 - [Agent compatibility](references/agent-compatibility.md)
 
+## Inspiration and attribution
+
+This project is inspired by Andrej Karpathy's [LLM Wiki pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f): compile source material into a persistent, structured wiki that can be maintained and reused by an Agent. This repository is an independent implementation of that idea, with its own public instructions, templates, compatibility boundaries, and validation contract.
+
+## Development
+
+The repository tests use only the Python standard library. Run the complete verification suite from the repository root:
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+The suite verifies the public file contract, version metadata, Skill frontmatter, UTF-8/LF encoding, private-marker exclusions, and every relative Markdown link in public documentation.
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
