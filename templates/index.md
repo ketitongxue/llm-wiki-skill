@@ -1,5 +1,7 @@
 # Knowledge Index
 
+Domain: {{DOMAIN}}
+
 Use this page as the stable entry point into the wiki.
 
 ## Hubs

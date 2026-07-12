@@ -18,7 +18,15 @@ Read [Agent compatibility](references/agent-compatibility.md) before using anoth
 
 ## Start a wiki
 
-Create an empty directory and ask the Agent:
+Initialize an empty or not-yet-created directory with the standard-library CLI:
+
+```bash
+python3 scripts/init_wiki.py --path ./my-wiki --domain "distributed systems"
+```
+
+The initializer creates `SCHEMA.md`, `purpose.md`, `index.md`, and `log.md`, plus the Raw and Wiki subdirectories. It refuses to overwrite a non-empty directory and fails if a bundled template contains an undeclared placeholder.
+
+You can also ask the Agent:
 
 > Initialize an LLM Wiki in this directory using the bundled templates. Help me define its purpose and schema before ingesting sources.
 
@@ -44,9 +52,10 @@ The repository tests use only the Python standard library. Run the complete veri
 
 ```bash
 python3 -m unittest discover -s tests -v
+python3 scripts/validate.py
 ```
 
-The suite verifies the public file contract, version metadata, Skill frontmatter, UTF-8/LF encoding, private-marker exclusions, and every relative Markdown link in public documentation.
+The suite and validator verify the public file contract, version metadata, Skill frontmatter, UTF-8/LF encoding, relative Markdown links, symlinks, undeclared template placeholders, and private or credential-like markers. The validator skips only `.git/`, `dist/`, and `__pycache__/` directories.
 
 ## License
 

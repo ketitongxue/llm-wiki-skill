@@ -1,5 +1,7 @@
 # Schema
 
+This schema organizes knowledge about {{DOMAIN}}.
+
 ## Layers
 
 - `raw/`: immutable or append-only source captures with provenance.

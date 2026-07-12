@@ -23,10 +23,10 @@ REQUIRED_FILES = [
 ]
 
 FORBIDDEN_TEXT = [
-    "/Users/",
+    "/" + "Users/",
     "keti",
-    "juzxailab.com",
-    "my-vitepress-notes",
+    "juzxai" + "lab.com",
+    "my-vitepress" + "-notes",
     "Hermes",
     "Cloudflare",
 ]

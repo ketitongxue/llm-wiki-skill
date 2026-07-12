@@ -2,7 +2,7 @@
 
 ## Mission
 
-Build a connected knowledge base about a clearly defined domain so that durable explanations can be reused across future questions and sources.
+Build a connected knowledge base about {{DOMAIN}} so that durable explanations can be reused across future questions and sources.
 
 ## Audience
 

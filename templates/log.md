@@ -1,5 +1,7 @@
 # Maintenance Log
 
+Domain: {{DOMAIN}}
+
 Entries are newest first. Record structural and knowledge changes, not routine formatting.
 
 ## 2026-01-01
