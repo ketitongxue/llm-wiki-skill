@@ -57,6 +57,24 @@ python3 scripts/validate.py
 
 The suite and validator verify the public file contract, version metadata, Skill frontmatter, UTF-8/LF encoding, relative Markdown links, symlinks, undeclared template placeholders, and private or credential-like markers. The validator skips only `.git/`, `dist/`, and `__pycache__/` directories.
 
+## Build a release
+
+Build the deterministic ZIP and checksum manifest from the explicit public allowlist:
+
+```bash
+python3 scripts/package_release.py --output-dir dist
+```
+
+For version 1.0.0 this creates `dist/llm-wiki-skill-v1.0.0.zip` and `dist/SHA256SUMS.txt`. The archive always installs as a single `llm-wiki/` directory, uses normalized metadata, and excludes development files.
+
+Verify a downloaded release from the directory containing both files:
+
+```bash
+shasum -a 256 -c SHA256SUMS.txt
+```
+
+Release tags must match `v$(cat VERSION)`. The release workflow runs the full test and validation suites, builds twice, compares both artifacts, and publishes only the ZIP and checksum manifest.
+
 ## License
 
 MIT. See [LICENSE](LICENSE).

@@ -116,6 +116,16 @@ class ValidateRepositoryTests(unittest.TestCase):
             self.assertIn("templates/index.md", errors)
             self.assertIn("template token", errors)
 
+    def test_allows_only_the_standard_github_token_expression_in_release_workflow(self):
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self._copy_minimal_repository(root)
+            workflow = root / ".github/workflows/release.yml"
+            workflow.parent.mkdir(parents=True)
+            expression = "$" + "{" * 2 + " github.token " + "}" * 2
+            workflow.write_text(f"env:\n  GH_TOKEN: {expression}\n", encoding="utf-8")
+            self.assertEqual(validate_repository(root), [])
+
     def test_reports_symlinks_but_ignores_exact_generated_directories(self):
         with TemporaryDirectory() as temporary:
             root = Path(temporary)

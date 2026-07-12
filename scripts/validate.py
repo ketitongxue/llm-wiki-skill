@@ -94,11 +94,17 @@ def validate_repository(root: Path) -> list[str]:
             errors.append(f"private key material: {relative}")
 
         for token in TOKEN.findall(text):
-            allowed = relative in {
+            allowed_template = relative in {
                 "templates/SCHEMA.md", "templates/purpose.md",
                 "templates/index.md", "templates/log.md",
             } and token == DOMAIN_TOKEN
-            if not allowed:
+            github_token_expression = "{" * 2 + " github.token " + "}" * 2
+            allowed_github_token = (
+                relative == ".github/workflows/release.yml"
+                and token == github_token_expression
+                and ("$" + token) in text
+            )
+            if not (allowed_template or allowed_github_token):
                 errors.append(f"undeclared template token {token}: {relative}")
 
         if path.suffix.lower() == ".md":
